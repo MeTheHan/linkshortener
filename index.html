@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkShort - Ücretsiz URL Kısaltıcı</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔗</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-link"></i> LinkShort</h1>
+            <p class="tagline">Uzun linklerinizi kısaltın, kolayca paylaşın</p>
+            
+            <!-- YouTube Reklamı -->
+            <div class="youtube-promo">
+                <a href="https://www.youtube.com/@MTechnoW" target="_blank" class="youtube-link">
+                    <i class="fab fa-youtube"></i>
+                    <span>YouTube Kanalımıza Abone Olun: @MTechnoW</span>
+                    <i class="fas fa-external-link-alt"></i>
+                </a>
+            </div>
+        </header>
+
+        <main>
+            <div class="shortener-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-magic"></i> Hızlı URL Kısalt</h2>
+                    <p class="subtitle">Linkinizi yapıştırın, kısa linkiniz hazır!</p>
+                </div>
+                
+                <div class="input-section">
+                    <div class="url-input-group">
+                        <input type="url" id="urlInput" 
+                               placeholder="https://örnek.com/çok-uzun-bir-link-adresi-buraya-yazın" 
+                               required>
+                        <button id="shortenBtn">
+                            <i class="fas fa-scissors"></i>
+                            <span>Kısalt</span>
+                        </button>
+                    </div>
+                    
+                    <!-- reCAPTCHA Bölümü -->
+                    <div class="recaptcha-section">
+                        <div class="g-recaptcha" 
+                             id="recaptcha"
+                             data-sitekey="6LdehjAsAAAAADEfonPcKkjSo_A_264614akbxj4" 
+                             data-callback="onRecaptchaSuccess"
+                             data-expired-callback="onRecaptchaExpired"
+                             data-error-callback="onRecaptchaError">
+                        </div>
+                        <small class="recaptcha-note">Spam'den korunmak için doğrulama gereklidir</small>
+                        <div class="recaptcha-error" id="recaptchaError">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>Lütfen "Ben robot değilim" doğrulamasını yapın!</span>
+                        </div>
+                    </div>
+                    
+                    <div class="optional-section">
+                        <div class="toggle-option" id="toggleCustomCodeBtn">
+                            <i class="fas fa-cog"></i>
+                            <span>Özel kod kullan (Kendi linkini oluştur)</span>
+                            <i class="fas fa-chevron-down" id="toggleIcon"></i>
+                        </div>
+                        
+                        <div class="custom-code-group" id="customCodeSection">
+                            <div class="custom-input-wrapper">
+                                <span class="domain-prefix" id="domainPrefix">linkshort.tr/</span>
+                                <input type="text" id="customCode" 
+                                       placeholder="istediğiniz-kodu-yazın" 
+                                       maxlength="30"
+                                       title="Kendi özel kodunuzu yazın (harf, rakam, tire, alt çizgi)">
+                            </div>
+                            <small class="custom-code-info">
+                                <i class="fas fa-lightbulb"></i>
+                                Özel kodunuzu kendiniz belirleyin! Örneğin: "benim-link", "indirme2024", "özel-duyuru"
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sonuç Kutusu -->
+            <div class="result-card" id="resultCard" style="display: none;">
+                <div class="result-header">
+                    <h3><i class="fas fa-check-circle success-icon"></i> Linkiniz Hazır!</h3>
+                    <button class="close-btn" id="closeResultBtn">&times;</button>
+                </div>
+                
+                <div class="result-body">
+                    <div class="short-url-container">
+                        <div class="url-display">
+                            <input type="text" id="shortUrlOutput" readonly>
+                            <button class="copy-btn" id="copyBtn">
+                                <i class="far fa-copy"></i> Kopyala
+                            </button>
+                        </div>
+                        <div class="original-url">
+                            <small>Orijinal: <span id="originalUrlText"></span></small>
+                        </div>
+                    </div>
+                    
+                    <div class="result-features">
+                        <div class="quick-actions-section">
+                            <h4><i class="fas fa-bolt"></i> Hızlı İşlemler</h4>
+                            <div class="quick-actions-grid">
+                                <button class="quick-action-btn test-btn" id="testLinkBtn">
+                                    <i class="fas fa-external-link-alt"></i> Linki Test Et
+                                </button>
+                                <button class="quick-action-btn stats-btn" id="viewStatsBtn">
+                                    <i class="fas fa-chart-bar"></i> İstatistikleri Gör
+                                </button>
+                                <button class="quick-action-btn new-btn" id="newLinkBtn">
+                                    <i class="fas fa-plus-circle"></i> Yeni Link Oluştur
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="stats-section">
+                            <h4><i class="fas fa-chart-bar"></i> İstatistikler</h4>
+                            <div class="stats-grid">
+                                <div class="stat-box">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-mouse-pointer"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <div class="stat-value" id="clickCount">0</div>
+                                        <div class="stat-label">Tıklanma</div>
+                                    </div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-icon">
+                                        <i class="far fa-calendar"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <div class="stat-value" id="createdDate">-</div>
+                                        <div class="stat-label">Oluşturulma</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="share-section">
+                        <h4><i class="fas fa-share-alt"></i> Hızlı Paylaş</h4>
+                        <div class="share-buttons">
+                            <button class="share-btn whatsapp" id="whatsappBtn">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </button>
+                            <button class="share-btn telegram" id="telegramBtn">
+                                <i class="fab fa-telegram"></i> Telegram
+                            </button>
+                            <button class="share-btn twitter" id="twitterBtn">
+                                <i class="fab fa-twitter"></i> Twitter
+                            </button>
+                            <button class="share-btn copy-link" id="copyLinkBtn">
+                                <i class="fas fa-link"></i> Link Kopyala
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Son Linkler -->
+            <div class="recent-links-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-history"></i> Son Kısaltılan Linkler</h3>
+                    <button class="refresh-btn" id="refreshLinksBtn">
+                        <i class="fas fa-sync-alt"></i> Yenile
+                    </button>
+                </div>
+                
+                <div class="links-container">
+                    <div id="linksList" class="links-list">
+                        <div class="empty-state">
+                            <i class="fas fa-link-slash"></i>
+                            <p>Henüz kısaltılmış link yok</p>
+                            <small>İlk linkinizi kısaltın!</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YouTube Kartı -->
+            <div class="youtube-card">
+                <div class="card-header">
+                    <h3><i class="fab fa-youtube"></i> YouTube Kanalımız</h3>
+                    <a href="https://www.youtube.com/@MTechnoW" target="_blank" class="youtube-subscribe-btn">
+                        <i class="fab fa-youtube"></i> Abone Ol
+                    </a>
+                </div>
+                <div class="youtube-card-body">
+                    <div class="youtube-info">
+                        <div class="youtube-icon">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                        <div class="youtube-details">
+                            <h4>@MTechnoW</h4>
+                            <p>Teknoloji, yazılım, programlama ve daha fazlası için YouTube kanalımıza göz atın!</p>
+                            <div class="youtube-stats">
+                                <span><i class="fas fa-video"></i> Teknoloji Videoları</span>
+                                <span><i class="fas fa-code"></i> Kod Dersleri</span>
+                                <span><i class="fas fa-lightbulb"></i> İpucuları</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="youtube-cta">
+                        <a href="https://www.youtube.com/@MTechnoW" target="_blank" class="youtube-watch-btn">
+                            <i class="fas fa-play"></i> Videoları İzle
+                        </a>
+                        <a href="https://www.youtube.com/@MTechnoW?sub_confirmation=1" target="_blank" class="youtube-subscribe-btn-main">
+                            <i class="fab fa-youtube"></i> ABONE OL
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bilgi Kartları -->
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h4>Hızlı ve Ücretsiz</h4>
+                    <p>Sınırsız URL kısaltma, tamamen ücretsiz</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4>Güvenli</h4>
+                    <p>Tüm linkler SSL ile korunmaktadır</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4>İstatistikler</h4>
+                    <p>Link tıklanma sayılarını takip edin</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-pen"></i>
+                    </div>
+                    <h4>Özel Kod</h4>
+                    <p>Kendi özel kodunuzla link oluşturun</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3><i class="fas fa-link"></i> LinkShort</h3>
+                    <p>Ücretsiz URL Kısaltma Hizmeti</p>
+                </div>
+                
+                <div class="footer-stats">
+                    <div class="footer-stat">
+                        <i class="fas fa-link"></i>
+                        <span>Toplam Link: <strong id="totalLinks">0</strong></span>
+                    </div>
+                    <div class="footer-stat">
+                        <i class="fas fa-mouse-pointer"></i>
+                        <span>Toplam Tıklanma: <strong id="totalClicks">0</strong></span>
+                    </div>
+                    <div class="footer-stat">
+                        <i class="fab fa-youtube"></i>
+                        <span>YouTube: <strong>@MTechnoW</strong></span>
+                    </div>
+                </div>
+                
+                <div class="footer-bottom">
+                    <p>&copy; 2025 LinkShort. Tüm hakları saklıdır.</p>
+                    <p class="footer-note">
+                        <i class="fas fa-heart" style="color: #e74c3c;"></i>
+                        Firebase & GitHub Pages ile güçlendirilmiştir
+                    </p>
+                    <div class="social-links">
+                        <a href="https://www.youtube.com/@MTechnoW" target="_blank" class="social-link youtube">
+                            <i class="fab fa-youtube"></i> YouTube
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- reCAPTCHA Script -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <!-- SABİT SİTE URL'Sİ -->
+    <script>
+        const SITE_URL = 'https://methehan.github.io/linkshortener';
+        console.log('🚀 Site URL:', SITE_URL);
+    </script>
+    
+    <!-- Ana Uygulama JS -->
+    <script src="app.js"></script>
+    
+    <!-- Firebase Yapılandırması -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjDEP41k3K3Ds9NoCgEiwJrphV4TENWuQ",
+            authDomain: "linkshortenerofficial.firebaseapp.com",
+            projectId: "linkshortenerofficial",
+            storageBucket: "linkshortenerofficial.firebasestorage.app",
+            messagingSenderId: "143728518436",
+            appId: "1:143728518436:web:571fdd344c01cfed42bfb1",
+            measurementId: "G-39WZB07DHZ"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        window.firebaseDb = db;
+        window.SITE_URL = SITE_URL;
+    </script>
+</body>
+</html>
